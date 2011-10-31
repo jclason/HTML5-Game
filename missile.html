@@ -35,11 +35,15 @@
 			
 			if (keydown.left) {
 				player.x -= 5;
+				player.sprite = player.leftsprite;
 			}
-
+			else player.sprite = player.straightsprite;
+			
 			if (keydown.right) {
 				player.x += 5;
+				player.sprite = player.rightsprite;
 			}
+			else if (!keydown.left) player.sprite = player.straightsprite;
 			
 			if (keydown.up) {
 				player.y -= 5;
@@ -100,7 +104,7 @@
 			},
 			shoot: function() {
 				var bulletPosition = this.midpoint();
-
+				
 				playerBullets.push(Bullet({
 					speed: 5,
 					x: bulletPosition.x,
@@ -114,7 +118,10 @@
 				};
 			}
 		};
-		player.sprite = Sprite("player");
+		player.sprite = Sprite("player.png");
+		player.leftsprite = Sprite("shipLeft.png");
+		player.rightsprite = Sprite("shipRight.png");
+		player.straightsprite = Sprite("player.png");
 		player.explode = function() {
 			this.active = false;
 			// Add an explosion graphic and then end the game
@@ -128,7 +135,7 @@
 			I.width = 3;
 			I.height = 3;
 			I.color = "#000";
-			I.sprite = Sprite("enemyFireball");
+			I.sprite = Sprite("playerFireball.png");
 			
 			I.inBounds = function() {
 				return I.x >= 0 && I.x <= CANVAS_WIDTH &&
@@ -136,8 +143,6 @@
 			};
 
 			I.draw = function() {
-				//canvas.fillStyle = this.color;
-				//canvas.fillRect(this.x, this.y, this.width, this.height);
 				this.sprite.draw(canvas, this.x, this.y);
 			};
 
@@ -166,7 +171,7 @@
 
 			I.width = 32;
 			I.height = 32;
-			I.sprite = Sprite("enemy");
+			I.sprite = Sprite("enemy.png");
 
 			I.inBounds = function() {
 				return I.x >= 0 && I.x <= CANVAS_WIDTH &&

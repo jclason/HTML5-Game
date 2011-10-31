@@ -65,7 +65,7 @@
   var spriteImagePath = "images/";
 
   window.Sprite = function(name, callback) {
-    return Sprite.load(spriteImagePath + name + ".png", callback);
+    return Sprite.load(spriteImagePath + name, callback);
   };
   window.Sprite.EMPTY = LoaderProxy();
   window.Sprite.load = Sprite.load;
