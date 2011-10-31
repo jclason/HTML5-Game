@@ -5,7 +5,7 @@
 	<script language="javascript" src="jquery.hotkeys.js"></script>
 	<script language="javascript" src="key_status.js"></script>
 	<script language="javascript" src="sprite.js"></script>
-	</head>
+</head>
 <body>
 	<script type="text/javascript">
 		var CANVAS_WIDTH = 720;
@@ -50,7 +50,7 @@
 			}
 			
 			player.x = player.x.clamp(0, CANVAS_WIDTH - player.width);
-			player.y = player.y.clamp(100, CANVAS_HEIGHT - player.height);
+			player.y = player.y.clamp(100, CANVAS_HEIGHT - player.height*2);
 			
 			playerBullets.forEach(function(bullet) {
 				bullet.update();
@@ -68,6 +68,8 @@
 				return enemy.active;
 			});
 
+			handleCollisions();
+			
 			if(Math.random() < 0.1) {
 				enemies.push(Enemy());
 			}
@@ -113,6 +115,10 @@
 			}
 		};
 		player.sprite = Sprite("player");
+		player.explode = function() {
+			this.active = false;
+			// Add an explosion graphic and then end the game
+		};
 		
 		function Bullet(I) {
 			I.active = true;
@@ -122,15 +128,17 @@
 			I.width = 3;
 			I.height = 3;
 			I.color = "#000";
-
+			I.sprite = Sprite("enemyFireball");
+			
 			I.inBounds = function() {
 				return I.x >= 0 && I.x <= CANVAS_WIDTH &&
 					I.y >= 0 && I.y <= CANVAS_HEIGHT;
 			};
 
 			I.draw = function() {
-				canvas.fillStyle = this.color;
-				canvas.fillRect(this.x, this.y, this.width, this.height);
+				//canvas.fillStyle = this.color;
+				//canvas.fillRect(this.x, this.y, this.width, this.height);
+				this.sprite.draw(canvas, this.x, this.y);
 			};
 
 			I.update = function() {
@@ -180,8 +188,38 @@
 				I.active = I.active && I.inBounds();
 			};
 
+			I.explode = function() {
+				this.active = false;
+				// Add an explosion graphic here
+			};
+  
 			return I;
 		}; 
+		
+		function collides(a, b) {
+			return a.x < b.x + b.width &&
+					a.x + a.width > b.x &&
+					a.y < b.y + b.height &&
+					a.y + a.height > b.y;
+		}
+		
+		function handleCollisions() {
+		playerBullets.forEach(function(bullet) {
+			enemies.forEach(function(enemy) {
+				if (collides(bullet, enemy)) {
+					enemy.explode();
+					bullet.active = false;
+				}
+			});
+		});
+
+			enemies.forEach(function(enemy) {
+				if (collides(enemy, player)) {
+					enemy.explode();
+					player.explode();
+				}
+			});
+		}
 	</script>
 </body>
 </html>
