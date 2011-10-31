@@ -21,7 +21,6 @@
 		var FPS = 30;
 		var gameLoop;
 		
-		
 		var startGameLoop = function() {
 			gameLoop = setInterval(function() {
 				update();
@@ -36,14 +35,17 @@
 		
 		function update() {
 			if (keydown.space) {
-				player.shoot();
+				if(!player.charging){
+					player.charging = true;
+					player.shoot();
+				}
 			}
 			
 			if(keydown.shift) {
 				if(gameLoop) {
 					canvas.font = '48px';
 					canvas.fillStyle = "Red";
-					canvas.fillText("PAUSED", player.x-20, player.y+20);
+					canvas.fillText("PAUSED", 200, 200);
 					clearInterval(gameLoop);
 					gameLoop = 0;
 				}
@@ -92,6 +94,9 @@
 			handleCollisions();
 			// Player death, game over
 			if(!player.active) {
+				player.sprite = player.deathsprite;
+				canvas.fillStyle = "rgba(255,0,0,.3)";
+				canvas.fillRect(2, 2, CANVAS_WIDTH, CANVAS_HEIGHT);
 				clearInterval(gameLoop);
 			}
 			var enemySeed = Math.random();
@@ -123,18 +128,22 @@
 			y: 370,
 			width: 32,
 			height: 32,
+			rateOfFire: 200,
 			active: true,
+			charging: false,
 			draw: function() {
 				this.sprite.draw(canvas, this.x, this.y);
 			},
 			shoot: function() {
 				var bulletPosition = this.midpoint();
 				
-				playerBullets.push(Bullet({
-					speed: 5,
-					x: bulletPosition.x,
-					y: bulletPosition.y
-				}));
+				setTimeout(function() { 
+								player.charging = false;
+								playerBullets.push(Bullet({
+								speed: 5,
+								x: bulletPosition.x,
+								y: bulletPosition.y
+								}))}, this.rateOfFire);
 			},
 			midpoint: function() {
 				return {
@@ -148,6 +157,7 @@
 		player.leftsprite = Sprite("shipLeft.png");
 		player.rightsprite = Sprite("shipRight.png");
 		player.straightsprite = Sprite("player.png");
+		player.deathsprite = Sprite("explosion.png");
 		
 		player.explode = function() {
 			this.active = false;
@@ -198,13 +208,22 @@
 			I.width = 32;
 			I.height = 32;
 			I.sprite = Sprite("enemy.png");
+			I.deathsprite = Sprite("explosion.png");
 			
 			if(I.type === 'B') {
-				I.sprite = Sprite("greenEnemy.png");
-				I.x = 0;
+				var pickSide = Math.random();
+				if(pickSide < .5) {
+					I.sprite = Sprite("greenEnemyLeft.png");
+					I.x = CANVAS_WIDTH-I.width;
+					I.xVelocity = -8;
+				}
+				else {
+					I.sprite = Sprite("greenEnemy.png");
+					I.x = 0;
+					I.xVelocity = 8;
+				}
 				I.y = player.y;
 				I.yVelocity = 0;
-				I.xVelocity = 8;
 			}
 
 			I.inBounds = function() {
@@ -230,6 +249,7 @@
 
 			I.explode = function() {
 				this.active = false;
+				I.sprite = I.deathsprite;
 				// Add an explosion graphic here
 			};
   
