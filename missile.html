@@ -19,10 +19,16 @@
 		var enemies = [];
 		
 		var FPS = 30;
-		setInterval(function() {
-			update();
-			draw();
-		}, 1000/FPS);
+		var gameLoop;
+		
+		
+		var startGameLoop = function() {
+			gameLoop = setInterval(function() {
+				update();
+				draw();
+				}, 1000/FPS);
+		}
+		startGameLoop();
 		
 		Number.prototype.clamp = function(min, max) {
 			return Math.min(Math.max(this, min), max);
@@ -31,6 +37,17 @@
 		function update() {
 			if (keydown.space) {
 				player.shoot();
+			}
+			
+			if(keydown.shift) {
+				if(gameLoop) {
+					canvas.font = '48px';
+					canvas.fillStyle = "Red";
+					canvas.fillText("PAUSED", player.x-20, player.y+20);
+					clearInterval(gameLoop);
+					gameLoop = 0;
+				}
+				else startGameLoop();
 			}
 			
 			if (keydown.left) {
@@ -73,9 +90,16 @@
 			});
 
 			handleCollisions();
-			
-			if(Math.random() < 0.1) {
+			// Player death, game over
+			if(!player.active) {
+				clearInterval(gameLoop);
+			}
+			var enemySeed = Math.random();
+			if(enemySeed < 0.05) {
 				enemies.push(Enemy());
+			}
+			if (enemySeed < .005) {
+				enemies.push(Enemy(Enemy(), 'B'));
 			}
 		}
 
@@ -96,9 +120,10 @@
 		var player = {
 			color: "#00A",
 			x: 220,
-			y: 270,
+			y: 370,
 			width: 32,
 			height: 32,
+			active: true,
 			draw: function() {
 				this.sprite.draw(canvas, this.x, this.y);
 			},
@@ -118,10 +143,12 @@
 				};
 			}
 		};
+		
 		player.sprite = Sprite("player.png");
 		player.leftsprite = Sprite("shipLeft.png");
 		player.rightsprite = Sprite("shipRight.png");
 		player.straightsprite = Sprite("player.png");
+		
 		player.explode = function() {
 			this.active = false;
 			// Add an explosion graphic and then end the game
@@ -143,7 +170,8 @@
 			};
 
 			I.draw = function() {
-				this.sprite.draw(canvas, this.x, this.y);
+				if(I.active)
+					this.sprite.draw(canvas, this.x, this.y);
 			};
 
 			I.update = function() {
@@ -156,13 +184,11 @@
 			return I;
 		}
 
-		function Enemy(I) {
+		function Enemy(I, type) {
 			I = I || {};
-
+			I.type = type;
 			I.active = true;
 			I.age = Math.floor(Math.random() * 128);
-
-			I.color = "#A2B";
 
 			I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
 			I.y = 0;
@@ -172,6 +198,14 @@
 			I.width = 32;
 			I.height = 32;
 			I.sprite = Sprite("enemy.png");
+			
+			if(I.type === 'B') {
+				I.sprite = Sprite("greenEnemy.png");
+				I.x = 0;
+				I.y = player.y;
+				I.yVelocity = 0;
+				I.xVelocity = 8;
+			}
 
 			I.inBounds = function() {
 				return I.x >= 0 && I.x <= CANVAS_WIDTH &&
@@ -185,8 +219,9 @@
 			I.update = function() {
 				I.x += I.xVelocity;
 				I.y += I.yVelocity;
-
-				I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
+				
+				if(!type)
+					I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
 
 				I.age++;
 
@@ -209,14 +244,14 @@
 		}
 		
 		function handleCollisions() {
-		playerBullets.forEach(function(bullet) {
-			enemies.forEach(function(enemy) {
-				if (collides(bullet, enemy)) {
-					enemy.explode();
-					bullet.active = false;
-				}
+			playerBullets.forEach(function(bullet) {
+				enemies.forEach(function(enemy) {
+					if (collides(bullet, enemy)) {
+						enemy.explode();
+						bullet.active = false;
+					}
+				});
 			});
-		});
 
 			enemies.forEach(function(enemy) {
 				if (collides(enemy, player)) {
