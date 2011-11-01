@@ -28,16 +28,23 @@
 		var skyy = 0, skydy = 1;
 		var FPS = 30;
 		var gameLoop;
+		var playerScore = 0;
 		
 		var startGameLoop = function() {
 			if(player) {
 				if(!player.active) {
 					// If the game is over, reset it
+					playerScore = 0;
 					player.x = 220;
 					player.y = 370;
 					player.active = true;
+					enemies.forEach(function(enemy) {
+						enemy.active = false;
+					});
 				}
 			}
+			// Clear the onclick function added when the player dies
+			canvasElement.get(0).onclick = 0;
 			gameLoop = setInterval(function() {
 				update();
 				draw();
@@ -151,7 +158,6 @@
 		}
 		
 		var player = {
-			color: "#00A",
 			x: 220,
 			y: 370,
 			width: 32,
@@ -190,6 +196,32 @@
 		player.explode = function() {
 			this.active = false;
 		};
+		
+		// Attempt to use iOS rotation data to move
+		if (window.DeviceMotionEvent) {
+			window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+		}
+
+		function deviceOrientationHandler(eventData) {
+			if(eventData.gamma === 0) 
+				return;
+				
+			if(eventData.gamma > 0) {
+				player.x += 5;
+				player.sprite = player.rightsprite;
+			} else if (eventData.gamma < 0) {
+					player.x -= 5;
+					player.sprite = player.leftsprite;
+			}
+			if(eventData.beta > 0) {
+				player.y += 5;
+			} else if (eventData.beta < 0) {
+					player.y -= 5;
+			}
+		}
+		
+		// Firing based on iOS touch
+		window.addEventListener('touchstart', player.shoot);
 		
 		function Bullet(I) {
 			I.active = true;
