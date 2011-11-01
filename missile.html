@@ -5,6 +5,11 @@
 	<script language="javascript" src="jquery.hotkeys.js"></script>
 	<script language="javascript" src="key_status.js"></script>
 	<script language="javascript" src="sprite.js"></script>
+	<style type="text/css" media="screen">
+		canvas, img { display:block; margin:1em auto; border:1px solid black; }
+		canvas { background:url(images/bg.png) }
+	</style>
+	<title>Space Shooter</title>
 </head>
 <body>
 	<script type="text/javascript">
@@ -15,13 +20,24 @@
 							  "' height='" + CANVAS_HEIGHT + "'></canvas>");
 		var canvas = canvasElement.get(0).getContext("2d");
 		canvasElement.appendTo('body');
+		
 		var playerBullets = [];
 		var enemies = [];
-		
+		var sky = new Image();
+		sky.src = "images/scrollingbg.png";
+		var skyy = 0, skydy = 1;
 		var FPS = 30;
 		var gameLoop;
 		
 		var startGameLoop = function() {
+			if(player) {
+				if(!player.active) {
+					// If the game is over, reset it
+					player.x = 220;
+					player.y = 370;
+					player.active = true;
+				}
+			}
 			gameLoop = setInterval(function() {
 				update();
 				draw();
@@ -75,6 +91,14 @@
 			player.x = player.x.clamp(0, CANVAS_WIDTH - player.width);
 			player.y = player.y.clamp(100, CANVAS_HEIGHT - player.height*2);
 			
+			// Update our location in the background image
+			if ((skyy + skydy) < (430 - skydy)){ 
+				skyy += skydy; 
+			}
+			else {
+				skyy = 0;
+			}
+			
 			playerBullets.forEach(function(bullet) {
 				bullet.update();
 			});
@@ -95,8 +119,7 @@
 			// Player death, game over
 			if(!player.active) {
 				player.sprite = player.deathsprite;
-				canvas.fillStyle = "rgba(255,0,0,.3)";
-				canvas.fillRect(2, 2, CANVAS_WIDTH, CANVAS_HEIGHT);
+				canvasElement.get(0).onclick = startGameLoop;
 				clearInterval(gameLoop);
 			}
 			var enemySeed = Math.random();
@@ -106,10 +129,15 @@
 			if (enemySeed < .005) {
 				enemies.push(Enemy(Enemy(), 'B'));
 			}
+			if (enemySeed < .003) {
+				enemies.push(Enemy(Enemy(), 'C'));
+			}
 		}
 
 		function draw() {
 			canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+			
+			canvas.drawImage(sky, 0, skyy, 720, 480, 0, 0, 720, 480);
 			
 			player.draw();
 			
@@ -161,7 +189,6 @@
 		
 		player.explode = function() {
 			this.active = false;
-			// Add an explosion graphic and then end the game
 		};
 		
 		function Bullet(I) {
@@ -169,8 +196,8 @@
 
 			I.xVelocity = 0;
 			I.yVelocity = -I.speed;
-			I.width = 3;
-			I.height = 3;
+			I.width = 5;
+			I.height = 5;
 			I.color = "#000";
 			I.sprite = Sprite("playerFireball.png");
 			
@@ -210,22 +237,46 @@
 			I.sprite = Sprite("enemy.png");
 			I.deathsprite = Sprite("explosion.png");
 			
-			if(I.type === 'B') {
+			if((I.type === 'B') || (I.type === 'C')) {
 				var pickSide = Math.random();
 				if(pickSide < .5) {
-					I.sprite = Sprite("greenEnemyLeft.png");
-					I.x = CANVAS_WIDTH-I.width;
-					I.xVelocity = -8;
+					if(I.type === 'B') {
+						// Enemy B Heading Left
+						I.sprite = Sprite("greenEnemyLeft.png");
+						I.x = CANVAS_WIDTH-I.width;
+						I.xVelocity = -8;
+						I.y = player.y;
+					}
+					else if(I.type === 'C') {
+						// Enemy C Heading Left
+						I.sprite = Sprite("Wily.png");
+						I.x = CANVAS_WIDTH-I.width;
+						I.xVelocity = -2;
+					}
 				}
 				else {
-					I.sprite = Sprite("greenEnemy.png");
-					I.x = 0;
-					I.xVelocity = 8;
+					if(I.type === 'B') {
+						// Enemy B Heading Right
+						I.sprite = Sprite("greenEnemy.png");
+						I.x = 0;
+						I.xVelocity = 8;
+						I.y = player.y;
+					}
+					else if(I.type === 'C') {
+						// Enemy C Heading Right
+						I.sprite = Sprite("Wily.png");
+						I.x = 0;
+						I.xVelocity = 2;
+						I.width = 70;
+					}
 				}
-				I.y = player.y;
 				I.yVelocity = 0;
 			}
-
+			else if (I.type === 'P') {
+					// Enemy C's projectiles
+					I.xVelocity = 0;
+					I.sprite = Sprite("enemyFireball.png");
+			}
 			I.inBounds = function() {
 				return I.x >= 0 && I.x <= CANVAS_WIDTH &&
 					I.y >= 0 && I.y <= CANVAS_HEIGHT;
@@ -239,11 +290,23 @@
 				I.x += I.xVelocity;
 				I.y += I.yVelocity;
 				
-				if(!type)
+				if(!this.type)
 					I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
 
 				I.age++;
-
+				
+				// C Type enemies have a chance to drop bombs
+				if(this.type === 'C') {
+					var fireChance = Math.random();
+					if(fireChance < .02) {
+						// Drop a bomb towards the player
+						var projectile = Enemy(Enemy(), 'P');
+						projectile.x = this.x;
+						projectile.y = this.y + this.height;
+						enemies.push(projectile);
+					}
+				}
+				
 				I.active = I.active && I.inBounds();
 			};
 
@@ -266,9 +329,11 @@
 		function handleCollisions() {
 			playerBullets.forEach(function(bullet) {
 				enemies.forEach(function(enemy) {
-					if (collides(bullet, enemy)) {
-						enemy.explode();
-						bullet.active = false;
+					if(enemy.type !== 'P') {
+						if (collides(bullet, enemy)) {
+							enemy.explode();
+							bullet.active = false;
+						}
 					}
 				});
 			});
