@@ -39,6 +39,9 @@
 		var playerScore = 0;
 		var tiltMoveX = 0;
 		var tiltMoveY = 0;
+		var gameOverImg = new Image();
+		gameOverImg.src = "images/gameover.png";
+		var tapToShoot = 0;
 		
 		var startGameLoop = function() {
 			if(player) {
@@ -55,7 +58,7 @@
 						bullet.active = false;
 					});
 					// Reset firing function after death changed it to respawning
-					canvasElement.get(0).onclick = function() { player.shoot(); };
+					canvasElement.get(0).onclick = function() { tapToShoot = 1; };
 				}
 			}
 			gameLoop = setInterval(function() {
@@ -70,10 +73,12 @@
 		};
 		
 		function update() {
-			if (keydown.space) {
+			//*** Controls Section ***
+			if (keydown.space || tapToShoot === 1) {
 				if(!player.charging){
 					player.charging = true;
 					player.shoot();
+					tapToShoot = 0;
 				}
 			}
 			
@@ -88,31 +93,32 @@
 				else startGameLoop();
 			}
 			
-			if (keydown.left  || (tiltMoveX < 0)) {
+			if (keydown.left  || keydown.a || (tiltMoveX < 0)) {
 				player.x -= 5;
-				if(keydown.left)
+				if(tiltMoveX >= 0)
 					player.sprite = player.leftsprite;
 				tiltMoveX = 0;
 			}
 			else player.sprite = player.straightsprite;
 			
-			if (keydown.right || (tiltMoveX > 0)) {
+			if (keydown.right || keydown.d || (tiltMoveX > 0)) {
 				player.x += 5;
-				if(keydown.right)
+				if(tiltMoveX <= 0)
 					player.sprite = player.rightsprite;
 				tiltMoveX = 0;
 			}
 			else if (!keydown.left) player.sprite = player.straightsprite;
 			
-			if (keydown.up || (tiltMoveY < 0)) {
+			if (keydown.up || keydown.w || (tiltMoveY < 0)) {
 				player.y -= 5;
 				tiltMoveY = 0;
 			}
 
-			if (keydown.down || (tiltMoveY > 0)) {
+			if (keydown.down || keydown.s || (tiltMoveY > 0)) {
 				player.y += 5;
 				tiltMoveY= 0;
 			}
+			//***********************
 			
 			player.x = player.x.clamp(0, CANVAS_WIDTH - player.width);
 			player.y = player.y.clamp(100, CANVAS_HEIGHT - player.height*2);
@@ -153,10 +159,10 @@
 				enemies.push(Enemy());
 			}
 			if (enemySeed < .005) {
-				enemies.push(Enemy(Enemy(), 'B'));
+				enemies.push(Enemy(0, 'B'));
 			}
 			if (enemySeed < .003) {
-				enemies.push(Enemy(Enemy(), 'C'));
+				enemies.push(Enemy(0, 'C'));
 			}
 		}
 
@@ -164,7 +170,7 @@
 			canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 			
 			canvas.drawImage(sky, 0, skyy, 720, 480, 0, 0, 720, 480);
-			
+
 			player.draw();
 			
 			playerBullets.forEach(function(bullet) {
@@ -174,6 +180,11 @@
 			enemies.forEach(function(enemy) {
 				enemy.draw();
 			});
+			
+			if(!player.active) {
+					canvas.drawImage(gameOverImg, ((CANVAS_WIDTH-gameOverImg.width)/2), 
+												((CANVAS_HEIGHT-gameOverImg.height)/2));
+			}
 		}
 		
 		
@@ -313,7 +324,7 @@
 					var fireChance = Math.random();
 					if(fireChance < .015) {
 						// Drop a bomb towards the player
-						var projectile = Enemy(Enemy(), 'P');
+						var projectile = Enemy(0, 'P');
 						projectile.x = this.x;
 						projectile.y = this.y + this.height;
 						enemies.push(projectile);

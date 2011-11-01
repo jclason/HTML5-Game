@@ -38,5 +38,5 @@ return {
 		explode: function() {
 			this.active = false;
 		}
-		};
+};
 }
