@@ -6,6 +6,7 @@
 	<script src="jquery.hotkeys.js"></script>
 	<script src="key_status.js"></script>
 	<script src="sprite.js"></script>
+	<script src="player.js"></script>
 	<style type="text/css" media="screen">
 		canvas, img { display:block; margin: 1em auto; border:2px solid black; text-align:center;}
 		canvas { background:url(images/bg.png); }
@@ -25,7 +26,7 @@
 		var canvasElement = $("<canvas id ='gameCanvas' width='" + CANVAS_WIDTH + 
 							  "' height='" + CANVAS_HEIGHT + "'></canvas>");
 		var canvas = canvasElement.get(0).getContext("2d");
-
+		var player = Player();
 		canvasElement.appendTo('body');
 		
 		var playerBullets = [];
@@ -53,11 +54,10 @@
 					playerBullets.forEach(function(bullet) {
 						bullet.active = false;
 					});
+					// Reset firing function after death changed it to respawning
 					canvasElement.get(0).onclick = function() { player.shoot(); };
 				}
 			}
-			// Clear the onclick function added when the player dies
-			//canvasElement.get(0).onclick = 0;
 			gameLoop = setInterval(function() {
 				update();
 				draw();
@@ -176,46 +176,7 @@
 			});
 		}
 		
-		var player = {
-			x: 220,
-			y: 370,
-			width: 32,
-			height: 32,
-			rateOfFire: 250,
-			active: true,
-			charging: false,
-			draw: function() {
-				this.sprite.draw(canvas, this.x, this.y);
-			},
-			midpoint: function() {
-				return {
-					x: this.x + this.width/2,
-					y: this.y + this.height/2
-				};
-			},
-			shoot: function() {
-				var bulletPosition = this.midpoint();
-				
-				setTimeout(function() { 
-								player.charging = false;
-								playerBullets.push(Bullet({
-								speed: 7,
-								x: bulletPosition.x,
-								y: bulletPosition.y
-								}))}, this.rateOfFire);
-			}
-		};
-		// Allows firing on iOS devices
-		canvasElement.get(0).onclick = function() { player.shoot(); };
-		player.sprite = Sprite("player.png");
-		player.leftsprite = Sprite("shipLeft.png");
-		player.rightsprite = Sprite("shipRight.png");
-		player.straightsprite = Sprite("player.png");
-		player.deathsprite = Sprite("explosion.png");
 		
-		player.explode = function() {
-			this.active = false;
-		};
 		
 		// Attempt to use iOS rotation data to move
 		if (window.DeviceMotionEvent) {
@@ -235,6 +196,8 @@
 					tiltMoveY -= 5;
 			}
 		}
+		// Allows firing on iOS devices
+		canvasElement.get(0).onclick = function() { player.shoot(); };
 		
 		// Firing based on iOS touch
 		window.addEventListener('touchstart', player.shoot);
@@ -348,7 +311,7 @@
 				// C Type enemies have a chance to drop bombs
 				if(this.type === 'C') {
 					var fireChance = Math.random();
-					if(fireChance < .02) {
+					if(fireChance < .015) {
 						// Drop a bomb towards the player
 						var projectile = Enemy(Enemy(), 'P');
 						projectile.x = this.x;
@@ -398,7 +361,6 @@
 	</script>
 
 	<footer id="contentinfo" class="body">
-	<div id="gameDiv"></div>
 	<address id="about" class="vcard body">
 		<span class="primary"><br/>
 			<strong><a href="#" class="fn url">Space Shooter</a></strong>
