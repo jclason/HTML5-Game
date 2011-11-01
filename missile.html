@@ -88,24 +88,30 @@
 				else startGameLoop();
 			}
 			
-			if (keydown.left) {
+			if (keydown.left  || (tiltMoveX < 0)) {
 				player.x -= 5;
-				player.sprite = player.leftsprite;
+				if(keydown.left)
+					player.sprite = player.leftsprite;
+				tiltMoveX = 0;
 			}
 			else player.sprite = player.straightsprite;
 			
-			if (keydown.right) {
+			if (keydown.right || (tiltMoveX > 0)) {
 				player.x += 5;
-				player.sprite = player.rightsprite;
+				if(keydown.right)
+					player.sprite = player.rightsprite;
+				tiltMoveX = 0;
 			}
 			else if (!keydown.left) player.sprite = player.straightsprite;
 			
-			if (keydown.up) {
+			if (keydown.up || (tiltMoveY < 0)) {
 				player.y -= 5;
+				tiltMoveY = 0;
 			}
 
-			if (keydown.down) {
+			if (keydown.down || (tiltMoveY > 0)) {
 				player.y += 5;
+				tiltMoveY= 0;
 			}
 			
 			player.x = player.x.clamp(0, CANVAS_WIDTH - player.width);
@@ -217,20 +223,16 @@
 		}
 
 		function deviceOrientationHandler(eventData) {
-			if(eventData.gamma === 0) 
-				return;
-				
+		
 			if(eventData.gamma > 0) {
-				player.x += 5;
-				player.sprite = player.rightsprite;
+				tiltMoveX += 5;
 			} else if (eventData.gamma < 0) {
-					player.x -= 5;
-					player.sprite = player.leftsprite;
+					tiltMoveX -= 5;
 			}
 			if(eventData.beta > 0) {
-				player.y += 5;
+				tiltMoveY += 5;
 			} else if (eventData.beta < 0) {
-					player.y -= 5;
+					tiltMoveY -= 5;
 			}
 		}
 		
@@ -322,7 +324,7 @@
 					// Enemy C's projectiles
 					I.xVelocity = 0;
 					I.sprite = Sprite("enemyFireball.png");
-					I.width = 5;
+					I.width = 10;
 					I.height = 20;
 			}
 			I.inBounds = function() {
