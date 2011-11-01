@@ -1,2 +1,1 @@
-A simple shooter game made to practice with the HTML 5 canvas object
-and using jQuery and javascript in general.
+A simple shooter game made to practice with the HTML 5 canvas object and using jQuery and javascript in general. Now supports iOS accelerometer controls for movement.
