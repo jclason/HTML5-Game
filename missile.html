@@ -43,6 +43,7 @@
 		gameOverImg.src = "images/gameover.png";
 		var tapToShoot = 0;
 		var highScoreFlag = 0;
+		var oldScore = 0;
 		
 		var startGameLoop = function() {
 			if(player) {
@@ -69,7 +70,8 @@
 				}, 1000/FPS);
 		}
 		startGameLoop();
-		
+
+		// Clamp definition, keeps items on screen
 		Number.prototype.clamp = function(min, max) {
 			return Math.min(Math.max(this, min), max);
 		};
@@ -167,23 +169,16 @@
 				
 				try {
 						// Save the player score to local storage
-						var oldScore = localStorage.getItem("highScore");
+						oldScore = localStorage.getItem("highScore");
 						if(oldScore) {
 							if(playerScore > oldScore) {
 								// New high score!
 								localStorage.setItem("highScore", playerScore);
-								canvas.fillStyle = "red";
-								canvas.font = 'bold 36px quartz MS';
-								canvas.fillText(playerScore + " is a new high score! Previous was best " + oldScore, 50, 50);
 							}
 						} 
 						else {
 							// No previous scores, new high score
 							localStorage.setItem("highScore", playerScore);
-							canvas.fillStyle = "red";
-							canvas.font = 'bold 36px quartz MS';
-							canvas.fillText(playerScore + " is a new high score! Previous was best " + oldScore, ((CANVAS_WIDTH-gameOverImg.width)/2), 
-												((CANVAS_HEIGHT-gameOverImg.height)/2)+50);
 						}
 					}
 					catch (e) {
@@ -239,7 +234,17 @@
 			
 			// Draw our game over image if the player is dead
 			if(!player.active) {
-					canvas.drawImage(gameOverImg, ((CANVAS_WIDTH-gameOverImg.width)/2), 
+				if(playerScore > oldScore) {
+					canvas.fillText(playerScore + "  is a new high score!", ((CANVAS_WIDTH-gameOverImg.width)/2+110), 
+												((CANVAS_HEIGHT-gameOverImg.height)/2)+50);
+					canvas.fillText("Previous best was " + oldScore, ((CANVAS_WIDTH-gameOverImg.width)/2+110), 
+												((CANVAS_HEIGHT-gameOverImg.height)/2)+175);	
+				}
+				else {
+					canvas.fillText("Your high score is " + oldScore + ". Try again!", ((CANVAS_WIDTH-gameOverImg.width)/2+25), 
+												((CANVAS_HEIGHT-gameOverImg.height)/2)+50);
+				}
+				canvas.drawImage(gameOverImg, ((CANVAS_WIDTH-gameOverImg.width)/2), 
 												((CANVAS_HEIGHT-gameOverImg.height)/2));
 			}
 		}
@@ -452,9 +457,9 @@
 			<span class="role">HTML5 Canvas Game</span>
 		</span>
 
-		<img src="player.png" alt="Ship" class="photo" />
+		<img src="player.png" alt="Ship" class="photo" /><br/>
 		<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
-							tilt controls on iOS devices. Scoring is still to come</span>
+							tilt controls on iOS devices.</span>
 	</address>
 </footer>
 </body>
