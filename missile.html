@@ -61,6 +61,7 @@
 					});
 					// Reset firing function after death changed it to respawning
 					canvasElement.get(0).onclick = function() { tapToShoot = 1; };
+					document.getElementById("shipPic").src = "images/player.png";
 				}
 			}
 			// Start the game loop
@@ -165,6 +166,7 @@
 			// Player death, game over
 			if(!player.active) {
 				player.sprite = player.deathsprite;
+				document.getElementById("shipPic").src = "images/explosion.png";
 				canvasElement.get(0).onclick = startGameLoop;
 				
 				try {
@@ -457,7 +459,7 @@
 			<span class="role">HTML5 Canvas Game</span>
 		</span>
 
-		<img src="player.png" alt="Ship" class="photo" /><br/>
+		<img src="player.png" id="shipPic" alt="Ship" class="photo" /><br/>
 		<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
 							tilt controls on iOS devices.</span>
 	</address>

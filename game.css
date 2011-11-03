@@ -16,7 +16,7 @@
 
 #about .primary {float: left; width: 200px;}
 #about .primary strong {color: #C64350; display: block; font-size: 1.286em;}
-#about .photo {float: left; margin: 5px 10px; width: 69px; border: 0;}
+#about .photo {float: left; margin: 20px 0 5px 10px; width: 69px; border: 0;}
 
 #about .url:link, #about .url:visited {text-decoration: none;}
 
