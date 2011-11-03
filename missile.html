@@ -318,7 +318,7 @@
 			I.xVelocity = 0
 			I.yVelocity = 2;
 
-			I.width = 40;
+			I.width = 45;
 			I.height = 32;
 			I.sprite = Sprite("enemy.png");
 			I.deathsprite = Sprite("explosion.png");
@@ -345,7 +345,7 @@
 						// Enemy B Side Plane Heading Right
 						I.sprite = Sprite("greenEnemy.png");
 						I.x = 0;
-						I.xVelocity = 8;
+						I.xVelocity = 8 + (playerScore / 600);
 						I.y = player.y;
 					}
 					else if(I.type === 'C') {
@@ -459,7 +459,7 @@
 			<span class="role">HTML5 Canvas Game</span>
 		</span>
 
-		<img src="player.png" id="shipPic" alt="Ship" class="photo" /><br/>
+		<img src="images/player.png" id="shipPic" alt="Ship" class="photo" /><br/>
 		<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
 							tilt controls on iOS devices.</span>
 	</address>

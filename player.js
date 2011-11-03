@@ -2,7 +2,7 @@ function Player() {
 return {
 		x: 220,
 		y: 370,
-		width: 32,
+		width: 40,
 		height: 32,
 		rateOfFire: 250,
 		active: true,
