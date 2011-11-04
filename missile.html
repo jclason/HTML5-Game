@@ -59,7 +59,6 @@
 					playerBullets.forEach(function(bullet) {
 						bullet.active = false;
 					});
-					// Reset firing function after death changed it to respawning
 					document.getElementById("shipPic").src = "images/player.png";
 				}
 			}
@@ -164,20 +163,23 @@
 			// And for enemies and player bullets
 			handleCollisions();
 			
+			var resetiOS = function(event){
+						canvasElement.get(0).removeEventListener('touchstart', resetiOS);
+						canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
+						startGameLoop();
+						canvasElement.get(0).onclick = function(){
+						canvasElement.get(0).onclick = function(event) { tapToShoot = 1; event.preventDefault();};
+						startGameLoop();
+					};
+			}
 			// Player death, game over
 			if(!player.active) {
+				canvasElement.get(0).onmouseup = 0;
 				player.sprite = player.deathsprite;
 				document.getElementById("shipPic").src = "images/explosion.png";
-				// iOS reset game click events
-				canvasElement.get(0).addEventListener('touchstart', function(event){
-					canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
-					startGameLoop();
-				})
-				// Normal browser reset game click events
-				canvasElement.get(0).onmouseup = function(){
-					canvasElement.get(0).onmouseup = function(event) { tapToShoot = 1; event.preventDefault();};
-					startGameLoop();
-				};
+				// Reset game after 3 seconds of game over screen
+				setTimeout(startGameLoop, 3000);
+				
 				
 				try {
 						// Save the player score to local storage
@@ -282,10 +284,8 @@
 			}
 		}
 		// Allows firing on iOS devices
-		canvasElement.get(0).onmouseup = function(event) { tapToShoot = 1; event.preventDefault(); event.stopPropagation(); return false;};
-		
-		// Firing based on iOS touch
-		//canvasElement.get(0).addEventListener('touchstart', player.shoot);
+		canvasElement.get(0).onclick = function(event) { tapToShoot = 1; event.preventDefault();};
+		canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
 		
 		function Bullet(I) {
 		
@@ -443,6 +443,7 @@
 		function handleCollisions() {
 			playerBullets.forEach(function(bullet) {
 				enemies.forEach(function(enemy) {
+					// Don't check for missiles, they can't be destroyed
 					if(enemy.type !== 'P') {
 						if (collides(bullet, enemy)) {
 							enemy.explode();
@@ -459,7 +460,7 @@
 				}
 			});
 		}
-		canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
+		
 	</script>
 	<div id="clicker">
 	<footer id="contentinfo" class="body">
