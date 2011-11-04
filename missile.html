@@ -168,6 +168,12 @@
 			if(!player.active) {
 				player.sprite = player.deathsprite;
 				document.getElementById("shipPic").src = "images/explosion.png";
+				// iOS reset game click events
+				canvasElement.get(0).addEventListener('touchstart', function(event){
+					canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
+					startGameLoop();
+				})
+				// Normal browser reset game click events
 				canvasElement.get(0).onmouseup = function(){
 					canvasElement.get(0).onmouseup = function(event) { tapToShoot = 1; event.preventDefault();};
 					startGameLoop();
