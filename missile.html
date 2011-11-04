@@ -60,7 +60,6 @@
 						bullet.active = false;
 					});
 					// Reset firing function after death changed it to respawning
-					canvasElement.get(0).onclick = function() { tapToShoot = 1; };
 					document.getElementById("shipPic").src = "images/player.png";
 				}
 			}
@@ -69,8 +68,10 @@
 				update();
 				draw();
 				}, 1000/FPS);
+			
 		}
 		startGameLoop();
+		
 
 		// Clamp definition, keeps items on screen
 		Number.prototype.clamp = function(min, max) {
@@ -167,7 +168,10 @@
 			if(!player.active) {
 				player.sprite = player.deathsprite;
 				document.getElementById("shipPic").src = "images/explosion.png";
-				canvasElement.get(0).onclick = startGameLoop;
+				canvasElement.get(0).onmouseup = function(){
+					canvasElement.get(0).onmouseup = function(event) { tapToShoot = 1; event.preventDefault();};
+					startGameLoop();
+				};
 				
 				try {
 						// Save the player score to local storage
@@ -272,10 +276,10 @@
 			}
 		}
 		// Allows firing on iOS devices
-		canvasElement.get(0).onclick = function() { player.shoot(); };
+		canvasElement.get(0).onmouseup = function(event) { tapToShoot = 1; event.preventDefault(); event.stopPropagation(); return false;};
 		
 		// Firing based on iOS touch
-		window.addEventListener('touchstart', player.shoot);
+		//canvasElement.get(0).addEventListener('touchstart', player.shoot);
 		
 		function Bullet(I) {
 		
@@ -449,20 +453,22 @@
 				}
 			});
 		}
+		canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
 	</script>
-
+	<div id="clicker">
 	<footer id="contentinfo" class="body">
-	<address id="about" class="vcard body">
-		<span class="primary"><br/>
-			<strong><a href="#" class="fn url">Space Shooter</a></strong>
+		<address id="about" class="vcard body">
+			<span class="primary"><br/>
+				<strong><a href="#" class="fn url">Space Shooter</a></strong>
 
-			<span class="role">HTML5 Canvas Game</span>
-		</span>
+				<span class="role">HTML5 Canvas Game</span>
+			</span>
 
-		<img src="images/player.png" id="shipPic" alt="Ship" class="photo" /><br/>
-		<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
-							tilt controls on iOS devices.</span>
-	</address>
-</footer>
+			<img src="images/player.png" id="shipPic" alt="Ship" class="photo" /><br/>
+			<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
+								tilt controls on iOS devices.</span>
+		</address>
+	</footer>
+	</div>
 </body>
 </html>
