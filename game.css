@@ -22,6 +22,24 @@
 
 #about .bio {float: right; width: 350px;}
 
+#key{
+	background: #fff;
+	font-style: normal;
+	margin-bottom: auto;
+	margin-top: 100px;
+	margin-left:200px;
+	margin-right:60px;
+	overflow: hidden;
+	padding: 0px;
+	text-align: center;
+	width: 250px;
+	float:left;
+
+	border-radius: 30px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+}
+
 /* Anchors */
 a {outline: 0;}
 a img {border: 0px; text-decoration: none;}

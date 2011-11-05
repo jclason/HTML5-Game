@@ -8,7 +8,7 @@
 	<script src="sprite.js"></script>
 	<script src="player.js"></script>
 	<style type="text/css" media="screen">
-		canvas, img { display:block; margin: 1em auto; border:2px solid black; text-align:center;}
+		canvas, img { display:block; margin-left: 30px; border:2px solid black; text-align:center;}
 		canvas { background:url(images/bg.png); }
 	</style>
 	<link rel="stylesheet" href="game.css" type="text/css" />
@@ -18,6 +18,14 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
+	
+	<div id="key">
+		Key:<br/>
+		<ul style="text-align:left">
+			<li>Shield Power Up <img src="images/shield.png" style="border:0"></li>
+			<li></li>
+		</ul>
+	</div>
 	<script src="game.js"></script>
 	<footer id="contentinfo" class="body">
 		<address id="about" class="vcard body">
@@ -30,6 +38,8 @@
 			<img src="images/player.png" id="shipPic" alt="Ship" class="photo" /><br/>
 			<span class="bio">This Space Shooter game was made using the HTML5 Canvas object and javascript. Use the arrows to move and space to shoot. It also supports
 								tilt controls on iOS devices.</span>
+			<br/>
+			
 		</address>
 	</footer>
 </body>

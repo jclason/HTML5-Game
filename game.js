@@ -408,9 +408,11 @@ function Enemy(I, type) {
 		I.sprite = I.deathsprite;
 		var powerUpChance = Math.random();
 		
+		// Add to the player score based on enemy type
+		// Each type has a different chance to spawn power ups
 		if(!type) {
 			playerScore += 5;
-			if(powerUpChance < .005) {
+			if(powerUpChance < .01) {
 				I.spawnShieldPowerUp();
 			}
 		}
