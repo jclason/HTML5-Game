@@ -7,8 +7,15 @@ return {
 		rateOfFire: 250,
 		active: true,
 		charging: false,
+		shielded: false,
 		draw: function() {
 			this.sprite.draw(canvas, this.x, this.y);
+			// Draw player shield transparent
+			canvas.globalAlpha = 0.2;
+			if(this.shielded) {
+				this.shieldSprite.draw(canvas, this.x-5, this.y-10);
+			}
+			canvas.globalAlpha = 1;
 		},
 		midpoint: function() {
 			return {
@@ -35,9 +42,17 @@ return {
 		rightsprite: Sprite("shipRight.png"),
 		straightsprite: Sprite("player.png"),
 		deathsprite: Sprite("explosion.png"),
+		shieldSprite: Sprite("playerShield.png"),
 		
 		explode: function() {
 			this.active = false;
+		},
+		addPowerUp: function(type) {
+			switch(type) {
+				case 'S':
+					this.shielded = true;
+					break;
+			}
 		}
 };
 }

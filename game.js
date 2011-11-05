@@ -354,6 +354,14 @@ function Enemy(I, type) {
 			I.width = 10;
 			I.height = 20;
 	}
+	else if (I.type === 'S') {
+			// Shield power up
+			I.width = 20;
+			I.height = 20;
+			I.sprite = Sprite("shield.png");
+			I.deathsprite = I.sprite;
+	}
+	
 	I.inBounds = function() {
 		return I.x >= 0 && I.x <= CANVAS_WIDTH &&
 			I.y >= 0 && I.y <= CANVAS_HEIGHT;
@@ -387,28 +395,52 @@ function Enemy(I, type) {
 		I.active = I.active && I.inBounds();
 	};
 
+	I.spawnShieldPowerUp = function() {
+		// Spawn shield power up
+		var newPowerUp = Enemy(0, 'S');
+		newPowerUp.x = I.x;
+		newPowerUp.y = I.y;
+		enemies.push(newPowerUp);
+	}
+	
 	I.explode = function() {
 		this.active = false;
 		I.sprite = I.deathsprite;
+		var powerUpChance = Math.random();
+		
 		if(!type) {
 			playerScore += 5;
+			if(powerUpChance < .005) {
+				I.spawnShieldPowerUp();
+			}
 		}
 		else {
 			switch(type) {
 				
-				case 'C': {
+				case 'C': 
 					playerScore += 30;
+					if(powerUpChance < .1) {
+						I.spawnShieldPowerUp();
+					}
 					break;
-				}
-				case 'B': {
+					
+				case 'B': 
 					playerScore += 20;
+					if(powerUpChance < .05) {
+						I.spawnShieldPowerUp();
+					}
 					break;
-				}
+
+				case 'S':
+					// Add a shield to the player
+					player.addPowerUp('S');
+					break;
 			}
 		
 		}
 	};
-
+	
+	
 	return I;
 }; 
 
@@ -422,8 +454,8 @@ function collides(a, b) {
 function handleCollisions() {
 	playerBullets.forEach(function(bullet) {
 		enemies.forEach(function(enemy) {
-			// Don't check for missiles, they can't be destroyed
-			if(enemy.type !== 'P') {
+			// Don't check for missiles or powerups, they can't be destroyed
+			if(enemy.type !== 'P' && enemy.type !== 'S') {
 				if (collides(bullet, enemy)) {
 					enemy.explode();
 					bullet.active = false;
@@ -435,7 +467,14 @@ function handleCollisions() {
 	enemies.forEach(function(enemy) {
 		if (collides(enemy, player)) {
 			enemy.explode();
-			player.explode();
+			if(enemy.type !== 'S') {
+				if(!player.shielded) {
+					player.explode();
+				}
+				else {
+					player.shielded = false;
+				}
+			}
 		}
 	});
 }
