@@ -31,6 +31,7 @@ var startGameLoop = function() {
 			playerScore = 0;
 			player.x = 220;
 			player.y = 370;
+			skyy = 1;
 			player.active = true;
 			enemies.forEach(function(enemy) {
 				enemy.active = false;
@@ -111,11 +112,11 @@ function update() {
 	player.y = player.y.clamp(50, CANVAS_HEIGHT - player.height*2);
 	
 	// Update our location in the background image
-	if ((skyy + skydy) < (430 - skydy)){ 
+	if ((skyy + skydy) < (900-485)){ 
 		skyy += skydy; 
 	}
 	else {
-		skyy = 0;
+		skyy = 1;
 	}
 	
 	// Move all player bullets
@@ -141,17 +142,7 @@ function update() {
 	// Check for collisions between player and enemy
 	// And for enemies and player bullets
 	handleCollisions();
-	
-	// This function isn't currently in use
-	var resetiOS = function(event){
-				canvasElement.get(0).removeEventListener('touchstart', resetiOS);
-				canvasElement.get(0).addEventListener('touchstart', function(event){event.preventDefault(); tapToShoot = 1; });
-				startGameLoop();
-				canvasElement.get(0).onclick = function(){
-				canvasElement.get(0).onclick = function(event) { tapToShoot = 1; event.preventDefault();};
-				startGameLoop();
-			};
-	}
+
 	// Player death, game over
 	if(!player.active) {
 		canvasElement.get(0).onmouseup = 0;
@@ -261,6 +252,7 @@ function deviceOrientationHandler(eventData) {
 	} else if (eventData.beta < 0) {
 			tiltMoveY -= 5;
 	}
+	eventData.stopPropagation();
 }
 // Allows firing on iOS devices
 canvasElement.get(0).onclick = function(event) { tapToShoot = 1; event.preventDefault();};
