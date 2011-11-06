@@ -188,6 +188,9 @@ function update() {
 	if (enemySeed < .003 && playerScore > 100) {
 		enemies.push(Enemy(0, 'C'));
 	}
+	if (enemySeed > .980 && playerScore> 200) {
+		enemies.push(Enemy(0, 'D'));
+	}
 }
 
 function draw() {
@@ -305,7 +308,7 @@ function Enemy(I, type) {
 	I.sprite = Sprite("enemy.png");
 	I.deathsprite = Sprite("explosion.png");
 	
-	if((I.type === 'B') || (I.type === 'C')) {
+	if((I.type === 'B') || (I.type === 'C') || (I.type === 'D')) {
 		var pickSide = Math.random();
 		if(pickSide < .5) {
 			if(I.type === 'B') {
@@ -314,12 +317,22 @@ function Enemy(I, type) {
 				I.x = CANVAS_WIDTH-I.width;
 				I.xVelocity = -8;
 				I.y = player.y;
+				I.yVelocity = 0;
 			}
 			else if(I.type === 'C') {
 				// Enemy C Bomber Heading Left
 				I.sprite = Sprite("Wily.png");
 				I.x = CANVAS_WIDTH-I.width;
 				I.xVelocity = -2;
+				I.yVelocity = 0;
+			}
+			else if(I.type === 'D') {
+				// Enemy D Asteroid Heading Left
+				I.sprite = Sprite("asteroid.png");
+				I.x = CANVAS_WIDTH+20;
+				I.y = Math.random() * (CANVAS_HEIGHT-100);
+				I.xVelocity = -10;
+				I.yVelocity = 6;
 			}
 		}
 		else {
@@ -328,7 +341,8 @@ function Enemy(I, type) {
 				I.sprite = Sprite("greenEnemy.png");
 				I.x = 0;
 				I.xVelocity = 8 + (playerScore / 600);
-				I.y = player.y;
+				I.y = player.y + (Math.random() * 40);
+				I.yVelocity = 0;
 			}
 			else if(I.type === 'C') {
 				// Enemy C Bomber Heading Right
@@ -336,9 +350,18 @@ function Enemy(I, type) {
 				I.x = 0;
 				I.xVelocity = 2;
 				I.width = 65;
+				I.yVelocity = 0;
+			}
+			else if(I.type === 'D') {
+				// Enemy D Asteroid Heading Left
+				I.sprite = Sprite("asteroid.png");
+				I.x = 0;
+				I.y = Math.random() * (CANVAS_HEIGHT-100);
+				I.xVelocity = 10;
+				I.yVelocity = 6;
 			}
 		}
-		I.yVelocity = 0;
+		
 	}
 	else if (I.type === 'P') {
 			// Enemy C's projectiles
