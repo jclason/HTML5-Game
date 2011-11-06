@@ -31,6 +31,7 @@ var startGameLoop = function() {
 			playerScore = 0;
 			player.x = 220;
 			player.y = 370;
+			player.multishot = false;
 			skyy = 1;
 			player.active = true;
 			enemies.forEach(function(enemy) {
@@ -298,7 +299,7 @@ function Enemy(I, type) {
 	I.y = 0;
 	I.xVelocity = 0
 	I.yVelocity = 2;
-
+	I.isPowerUp = false;
 	I.width = 45;
 	I.height = 32;
 	I.sprite = Sprite("enemy.png");
@@ -353,6 +354,13 @@ function Enemy(I, type) {
 			I.sprite = Sprite("shield.png");
 			I.deathsprite = I.sprite;
 	}
+	else if (I.type === 'M') {
+			// Multishot power up
+			I.width = 20;
+			I.height = 20;
+			I.sprite = Sprite("laserPowerUp.png");
+			I.deathsprite = I.sprite;
+	}
 	
 	I.inBounds = function() {
 		return I.x >= 0 && I.x <= CANVAS_WIDTH &&
@@ -387,11 +395,12 @@ function Enemy(I, type) {
 		I.active = I.active && I.inBounds();
 	};
 
-	I.spawnShieldPowerUp = function() {
+	I.spawnPowerUp = function(type) {
 		// Spawn shield power up
-		var newPowerUp = Enemy(0, 'S');
+		var newPowerUp = Enemy(0, type);
 		newPowerUp.x = I.x;
 		newPowerUp.y = I.y;
+		newPowerUp.isPowerUp = true;
 		enemies.push(newPowerUp);
 	}
 	
@@ -404,8 +413,11 @@ function Enemy(I, type) {
 		// Each type has a different chance to spawn power ups
 		if(!type) {
 			playerScore += 5;
-			if(powerUpChance < .01) {
-				I.spawnShieldPowerUp();
+			if(powerUpChance < .005) {
+				I.spawnPowerUp('S');
+			}
+			else if(powerUpChance < .01) {
+				I.spawnPowerUp('M');
 			}
 		}
 		else {
@@ -413,24 +425,30 @@ function Enemy(I, type) {
 				
 				case 'C': 
 					playerScore += 30;
-					if(powerUpChance < .1) {
-						I.spawnShieldPowerUp();
+					if(powerUpChance < .05) {
+						I.spawnPowerUp('S');
+					}
+					else if(powerUpChance < .08) {
+						I.spawnPowerUp('M');
 					}
 					break;
 					
 				case 'B': 
 					playerScore += 20;
-					if(powerUpChance < .05) {
-						I.spawnShieldPowerUp();
+					if(powerUpChance < .025) {
+						I.spawnPowerUp('S');
+					}
+					else if(powerUpChance < .05) {
+						I.spawnPowerUp('M');
 					}
 					break;
 
+				case 'M':
 				case 'S':
-					// Add a shield to the player
-					player.addPowerUp('S');
+					// This was a power up, add it to the player
+					player.addPowerUp(type);
 					break;
 			}
-		
 		}
 	};
 	
@@ -446,10 +464,11 @@ function collides(a, b) {
 }
 
 function handleCollisions() {
+	// Check player bullets and enemy collision
 	playerBullets.forEach(function(bullet) {
 		enemies.forEach(function(enemy) {
 			// Don't check for missiles or powerups, they can't be destroyed
-			if(enemy.type !== 'P' && enemy.type !== 'S') {
+			if(!enemy.isPowerUp && enemy.type !== 'P') {
 				if (collides(bullet, enemy)) {
 					enemy.explode();
 					bullet.active = false;
@@ -458,10 +477,11 @@ function handleCollisions() {
 		});
 	});
 
+	// Check enemy and player ship collision
 	enemies.forEach(function(enemy) {
 		if (collides(enemy, player)) {
 			enemy.explode();
-			if(enemy.type !== 'S') {
+			if(!enemy.isPowerUp) {
 				if(!player.shielded) {
 					player.explode();
 				}
