@@ -204,11 +204,13 @@ function draw() {
 	canvas.shadowBlur = 10;
 	canvas.shadowColor = "#000000";
 	
-	player.draw();
+	
 	
 	playerBullets.forEach(function(bullet) {
 		bullet.draw();
 	});
+	
+	player.draw();
 	
 	enemies.forEach(function(enemy) {
 		enemy.draw();
@@ -340,7 +342,7 @@ function Enemy(I, type) {
 			if(I.type === 'B') {
 				// Enemy B Side Plane Heading Right
 				I.sprite = Sprite("greenEnemy.png");
-				I.x = 0;
+				I.x = -10;
 				I.xVelocity = 8 + (playerScore / 600);
 				I.y = player.y + (Math.random() * 40);
 				I.yVelocity = 0;
@@ -348,7 +350,7 @@ function Enemy(I, type) {
 			else if(I.type === 'C') {
 				// Enemy C Bomber Heading Right
 				I.sprite = Sprite("Wily.png");
-				I.x = 0;
+				I.x = -10;
 				I.y = 5;
 				I.xVelocity = 2;
 				I.width = 65;
@@ -357,7 +359,7 @@ function Enemy(I, type) {
 			else if(I.type === 'D') {
 				// Enemy D Asteroid Heading Left
 				I.sprite = Sprite("asteroid.png");
-				I.x = 0;
+				I.x = -10;
 				I.y = Math.random() * (CANVAS_HEIGHT-100);
 				I.xVelocity = 6;
 				I.yVelocity = 3;
@@ -390,7 +392,7 @@ function Enemy(I, type) {
 	}
 	
 	I.inBounds = function() {
-		return I.x >= 0 && I.x <= CANVAS_WIDTH &&
+		return I.x >= -30 && I.x <= CANVAS_WIDTH+10 &&
 			I.y >= -30 && I.y <= CANVAS_HEIGHT;
 	};
 
