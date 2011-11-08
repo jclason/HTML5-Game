@@ -72,7 +72,7 @@ return {
 					break;
 				case 'M':
 					this.multishot = true;
-					setTimeout(function(){ player.multishot = false; console.log("REmove multi");}, 15000);
+					setTimeout(function(){ player.multishot = false; }, 15000);
 					break;
 			}
 		}

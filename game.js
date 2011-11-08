@@ -266,9 +266,8 @@ function Bullet(I) {
 	I.active = true;
 	I.xVelocity = 0;
 	I.yVelocity = -I.speed;
-	I.width = 5;
-	I.height = 5;
-	I.color = "#000";
+	I.width = 15;
+	I.height = 15;
 	I.sprite = Sprite("playerFireball.png");
 	
 	I.inBounds = function() {
@@ -298,7 +297,7 @@ function Enemy(I, type) {
 	I.age = Math.floor(Math.random() * 128);
 
 	I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
-	I.y = 0;
+	I.y = -30;
 	I.xVelocity = 0
 	I.yVelocity = 2;
 	I.isPowerUp = false;
@@ -324,14 +323,17 @@ function Enemy(I, type) {
 				I.x = CANVAS_WIDTH-I.width;
 				I.xVelocity = -2;
 				I.yVelocity = 0;
+				I.y = 5;
 			}
 			else if(I.type === 'D') {
 				// Enemy D Asteroid Heading Left
 				I.sprite = Sprite("asteroid.png");
 				I.x = CANVAS_WIDTH-20;
 				I.y = Math.random() * (CANVAS_HEIGHT-100);
-				I.xVelocity = -10;
-				I.yVelocity = 5;
+				I.xVelocity = -6;
+				I.yVelocity = 3;
+				I.width = 50;
+				I.height = 50;
 			}
 		}
 		else {
@@ -347,6 +349,7 @@ function Enemy(I, type) {
 				// Enemy C Bomber Heading Right
 				I.sprite = Sprite("Wily.png");
 				I.x = 0;
+				I.y = 5;
 				I.xVelocity = 2;
 				I.width = 65;
 				I.yVelocity = 0;
@@ -356,8 +359,10 @@ function Enemy(I, type) {
 				I.sprite = Sprite("asteroid.png");
 				I.x = 0;
 				I.y = Math.random() * (CANVAS_HEIGHT-100);
-				I.xVelocity = 10;
-				I.yVelocity = 5;
+				I.xVelocity = 6;
+				I.yVelocity = 3;
+				I.width = 50;
+				I.height = 50;
 			}
 		}
 		
@@ -366,8 +371,8 @@ function Enemy(I, type) {
 			// Enemy C's projectiles
 			I.xVelocity = 0;
 			I.sprite = Sprite("enemyFireball.png");
-			I.width = 10;
-			I.height = 20;
+			I.width = 16;
+			I.height = 60;
 	}
 	else if (I.type === 'S') {
 			// Shield power up
@@ -386,7 +391,7 @@ function Enemy(I, type) {
 	
 	I.inBounds = function() {
 		return I.x >= 0 && I.x <= CANVAS_WIDTH &&
-			I.y >= 0 && I.y <= CANVAS_HEIGHT;
+			I.y >= -30 && I.y <= CANVAS_HEIGHT;
 	};
 
 	I.draw = function() {
@@ -418,7 +423,7 @@ function Enemy(I, type) {
 	};
 
 	I.spawnPowerUp = function(type) {
-		// Spawn shield power up
+		// Spawn a power up at the location of the enemy that died
 		var newPowerUp = Enemy(0, type);
 		newPowerUp.x = I.x;
 		newPowerUp.y = I.y;
@@ -434,6 +439,7 @@ function Enemy(I, type) {
 		// Add to the player score based on enemy type
 		// Each type has a different chance to spawn power ups
 		if(!type) {
+			// Base A type enemy
 			playerScore += 5;
 			if(powerUpChance < .02) {
 				I.spawnPowerUp('S');
@@ -444,7 +450,7 @@ function Enemy(I, type) {
 		}
 		else {
 			switch(type) {
-				
+				// C type bomber enemy
 				case 'C': 
 					playerScore += 30;
 					if(powerUpChance < .06) {
@@ -454,9 +460,19 @@ function Enemy(I, type) {
 						I.spawnPowerUp('M');
 					}
 					break;
-					
+				// B type side plane enemy	
 				case 'B': 
 					playerScore += 20;
+					if(powerUpChance < .05) {
+						I.spawnPowerUp('S');
+					}
+					else if(powerUpChance < .11) {
+						I.spawnPowerUp('M');
+					}
+					break;
+				// D type asteroid enemy	
+				case 'D': 
+					playerScore += 30;
 					if(powerUpChance < .05) {
 						I.spawnPowerUp('S');
 					}
