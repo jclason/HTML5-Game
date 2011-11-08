@@ -52,7 +52,6 @@ var startGameLoop = function() {
 }
 startGameLoop();
 
-
 // Clamp definition, keeps items on screen
 Number.prototype.clamp = function(min, max) {
 	return Math.min(Math.max(this, min), max);
@@ -173,8 +172,8 @@ function update() {
 				}
 			}
 			
-			// Stop the game
-			clearInterval(gameLoop);
+		// Stop the game
+		clearInterval(gameLoop);
 	}
 	
 	// Add new enemies based on a random roll
@@ -329,10 +328,10 @@ function Enemy(I, type) {
 			else if(I.type === 'D') {
 				// Enemy D Asteroid Heading Left
 				I.sprite = Sprite("asteroid.png");
-				I.x = CANVAS_WIDTH+20;
+				I.x = CANVAS_WIDTH-20;
 				I.y = Math.random() * (CANVAS_HEIGHT-100);
 				I.xVelocity = -10;
-				I.yVelocity = 6;
+				I.yVelocity = 5;
 			}
 		}
 		else {
@@ -358,7 +357,7 @@ function Enemy(I, type) {
 				I.x = 0;
 				I.y = Math.random() * (CANVAS_HEIGHT-100);
 				I.xVelocity = 10;
-				I.yVelocity = 6;
+				I.yVelocity = 5;
 			}
 		}
 		
@@ -436,10 +435,10 @@ function Enemy(I, type) {
 		// Each type has a different chance to spawn power ups
 		if(!type) {
 			playerScore += 5;
-			if(powerUpChance < .005) {
+			if(powerUpChance < .02) {
 				I.spawnPowerUp('S');
 			}
-			else if(powerUpChance < .01) {
+			else if(powerUpChance < .03) {
 				I.spawnPowerUp('M');
 			}
 		}
@@ -448,20 +447,20 @@ function Enemy(I, type) {
 				
 				case 'C': 
 					playerScore += 30;
-					if(powerUpChance < .05) {
+					if(powerUpChance < .06) {
 						I.spawnPowerUp('S');
 					}
-					else if(powerUpChance < .08) {
+					else if(powerUpChance < .12) {
 						I.spawnPowerUp('M');
 					}
 					break;
 					
 				case 'B': 
 					playerScore += 20;
-					if(powerUpChance < .025) {
+					if(powerUpChance < .05) {
 						I.spawnPowerUp('S');
 					}
-					else if(powerUpChance < .05) {
+					else if(powerUpChance < .11) {
 						I.spawnPowerUp('M');
 					}
 					break;
@@ -490,8 +489,8 @@ function handleCollisions() {
 	// Check player bullets and enemy collision
 	playerBullets.forEach(function(bullet) {
 		enemies.forEach(function(enemy) {
-			// Don't check for missiles or powerups, they can't be destroyed
-			if(!enemy.isPowerUp && enemy.type !== 'P') {
+			// Don't check for powerups, they can't be destroyed
+			if(!enemy.isPowerUp) {
 				if (collides(bullet, enemy)) {
 					enemy.explode();
 					bullet.active = false;
