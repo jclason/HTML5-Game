@@ -404,6 +404,7 @@ function Enemy(I, type) {
 		I.x += I.xVelocity;
 		I.y += I.yVelocity;
 		
+		// A type enemies move back and forth
 		if(!this.type)
 			I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
 

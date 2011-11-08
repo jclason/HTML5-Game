@@ -31,19 +31,19 @@ return {
 			setTimeout(function() { 
 							player.charging = false;
 							playerBullets.push(Bullet({
-							speed: 7,
+							speed: 9,
 							x: bulletPosition.x,
 							y: bulletPosition.y
 							}))
 
 							if(player.multishot) {
 								var bullet2 = Bullet({
-											speed: 7,
+											speed: 9,
 											x: bulletPosition.x,
 											y: bulletPosition.y
 											});
 								var bullet3 = Bullet({
-											speed: 7,
+											speed: 9,
 											x: bulletPosition.x,
 											y: bulletPosition.y
 											});
